@@ -1,0 +1,158 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   CSS HELPER CLASSES - CSS VARIABLE MAPPINGS
+   Stage 7-A: Bridge between Tailwind classes and CSS custom properties
+   
+   This file provides semantic class mappings to ensure consistent theming
+   when CSS custom properties are used throughout the application.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── TEXT COLOR MAPPINGS ────────────────────────────────────────────────── */
+
+.text-gray-50 { color: var(--color-gray-50); }
+.text-gray-100 { color: var(--color-gray-100); }
+.text-gray-200 { color: var(--color-gray-200); }
+.text-gray-300 { color: var(--color-gray-300); }
+.text-gray-400 { color: var(--color-gray-400); }
+.text-gray-500 { color: var(--color-gray-500); }
+.text-gray-600 { color: var(--color-gray-600); }
+.text-gray-700 { color: var(--color-text); }
+.text-gray-800 { color: var(--color-gray-800); }
+.text-gray-900 { color: var(--color-text); }
+
+.text-blue-600 { color: var(--color-primary); }
+.text-blue-700 { color: var(--color-primary-hover); }
+.text-blue-800 { color: var(--color-primary); }
+.text-blue-100 { color: var(--color-primary-light); }
+
+.text-white { color: var(--color-text-inverse); }
+.text-red-600 { color: var(--color-error); }
+.text-red-700 { color: var(--color-error); }
+.text-green-600 { color: var(--color-success); }
+.text-green-700 { color: var(--color-success); }
+.text-yellow-600 { color: var(--color-warning); }
+.text-purple-600 { color: var(--color-info); }
+
+/* ── BACKGROUND COLOR MAPPINGS ──────────────────────────────────────────── */
+
+.bg-white { background-color: var(--color-card); }
+.bg-gray-50 { background-color: var(--color-surface-2); }
+.bg-gray-100 { background-color: var(--color-surface-2); }
+.bg-gray-200 { background-color: var(--color-gray-200); }
+
+.bg-blue-50 { background-color: rgba(22, 163, 74, 0.1); }
+.bg-blue-100 { background-color: rgba(22, 163, 74, 0.15); }
+.bg-blue-600 { background-color: var(--color-primary); }
+.bg-blue-700 { background-color: var(--color-primary-hover); }
+.bg-blue-800 { background-color: var(--color-primary-hover); }
+
+.bg-red-50 { background-color: rgba(220, 38, 38, 0.1); }
+.bg-red-600 { background-color: var(--color-error); }
+.bg-red-700 { background-color: var(--color-error); }
+
+.bg-green-50 { background-color: rgba(22, 163, 74, 0.1); }
+.bg-green-600 { background-color: var(--color-success); }
+.bg-green-700 { background-color: var(--color-success); }
+
+.bg-yellow-50 { background-color: rgba(217, 119, 6, 0.1); }
+.bg-purple-50 { background-color: rgba(37, 99, 235, 0.1); }
+.bg-purple-600 { background-color: var(--color-info); }
+
+/* ── BORDER COLOR MAPPINGS ──────────────────────────────────────────────── */
+
+.border-gray-300 { border-color: var(--color-border); }
+.border-gray-200 { border-color: var(--color-border); }
+.border-blue-600 { border-color: var(--color-primary); }
+.border-blue-500 { border-color: var(--color-primary); }
+.border-red-200 { border-color: var(--color-error); }
+.border-red-600 { border-color: var(--color-error); }
+.border-green-200 { border-color: var(--color-success); }
+.border-green-600 { border-color: var(--color-success); }
+
+/* ── HOVER STATES ───────────────────────────────────────────────────────── */
+
+.hover\:bg-gray-50:hover { background-color: var(--color-surface-2); }
+.hover\:bg-gray-100:hover { background-color: var(--color-surface-2); }
+.hover\:bg-blue-100:hover { background-color: rgba(22, 163, 74, 0.15); }
+.hover\:bg-blue-700:hover { background-color: var(--color-primary-hover); }
+.hover\:bg-green-100:hover { background-color: rgba(22, 163, 74, 0.15); }
+.hover\:bg-red-700:hover { background-color: var(--color-error); }
+
+.hover\:text-blue-600:hover { color: var(--color-primary); }
+.hover\:text-blue-700:hover { color: var(--color-primary-hover); }
+
+/* ── FOCUS RING COLORS ──────────────────────────────────────────────────── */
+
+.focus\:ring-2:focus { 
+    --tw-ring-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1), 0 0 0 3px var(--color-primary);
+}
+
+.focus\:ring-blue-500:focus {
+    --tw-ring-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1), 0 0 0 3px var(--color-primary);
+}
+
+/* ── SHADOW MAPPINGS ────────────────────────────────────────────────────── */
+
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* ── SEMANTIC COLOR UTILITY CLASSES ──────────────────────────────────────── */
+
+.text-primary { color: var(--color-primary); }
+.text-primary:hover { color: var(--color-primary-hover); }
+
+.text-surface { color: var(--color-surface); }
+.text-card { color: var(--color-card); }
+.text-muted { color: var(--color-text-muted); }
+
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary:hover { background-color: var(--color-primary-hover); }
+
+.bg-surface { background-color: var(--color-surface); }
+.bg-card { background-color: var(--color-card); }
+
+.border-primary { border-color: var(--color-primary); }
+.border-border { border-color: var(--color-border); }
+
+/* ── GRADIENT MAPPINGS ──────────────────────────────────────────────────── */
+
+.from-blue-600 { --tw-gradient-from: var(--color-primary); --tw-gradient-to: rgba(22, 163, 74, 0); }
+.to-blue-800 { --tw-gradient-to: var(--color-primary-hover); }
+
+/* ── OPACITY UTILITIES ──────────────────────────────────────────────────── */
+
+.text-opacity-50 { opacity: 0.5; }
+.text-opacity-75 { opacity: 0.75; }
+.bg-opacity-10 { opacity: 0.1; }
+.bg-opacity-20 { opacity: 0.2; }
+.bg-opacity-30 { opacity: 0.3; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DARK MODE OVERRIDES (when high-contrast is not active)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+html.dark .text-gray-700 { color: var(--color-text); }
+html.dark .text-gray-900 { color: var(--color-text); }
+html.dark .text-gray-600 { color: var(--color-text-muted); }
+
+html.dark .bg-white { background-color: var(--color-card); }
+html.dark .bg-gray-50 { background-color: var(--color-surface-2); }
+html.dark .bg-gray-100 { background-color: var(--color-surface-2); }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   HIGH CONTRAST MODE OVERRIDES
+   ════════════════════════════════════════════════════════════════════════════ */
+
+html.high-contrast .text-gray-700 { color: var(--color-text); }
+html.high-contrast .text-gray-900 { color: var(--color-text); }
+html.high-contrast .text-blue-600 { color: var(--color-primary); }
+html.high-contrast .text-primary { color: var(--color-primary) !important; }
+
+html.high-contrast .bg-white { background-color: var(--color-surface); }
+html.high-contrast .bg-gray-50 { background-color: var(--color-surface); }
+
+html.high-contrast .border-gray-300 { border-color: var(--color-border) !important; }
+html.high-contrast .border-blue-500 { border-color: var(--color-primary) !important; }

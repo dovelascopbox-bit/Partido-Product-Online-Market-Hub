@@ -1,0 +1,364 @@
+/* ────────────────────────────────────────────────────────────
+   ACCESSIBILITY TOOLBAR STYLES
+   Partido Product Online Market Hub - Stage 7-B
+   ──────────────────────────────────────────────────────────── */
+
+/* Toolbar container */
+#a11y-toolbar {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9990;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+/* Toggle button - main accessibility button */
+#a11y-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  font-size: 1.4rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background 0.2s;
+  font-weight: bold;
+}
+
+#a11y-toggle:hover {
+  transform: scale(1.1);
+  background: var(--color-primary-hover);
+}
+
+#a11y-toggle:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Panel container */
+#a11y-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  width: 280px;
+  overflow: hidden;
+  animation: slideIn 0.2s ease-out;
+}
+
+html.reduce-motion #a11y-panel {
+  animation: none;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Panel header */
+.a11y-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* Close button in header */
+#a11y-close {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s, color 0.2s;
+}
+
+#a11y-close:hover {
+  background: var(--color-surface-3);
+  color: var(--color-text);
+}
+
+#a11y-close:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+/* Panel body - options container */
+.a11y-panel-body {
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Individual option row */
+.a11y-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.25rem;
+  border-radius: var(--radius-sm);
+  transition: background 0.2s;
+}
+
+.a11y-option:hover {
+  background: var(--color-surface-2);
+}
+
+/* Icon in option */
+.a11y-icon {
+  font-size: 1.1rem;
+  width: 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Label text in option */
+.a11y-label {
+  flex: 1;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  user-select: none;
+}
+
+/* Toggle switch button */
+.a11y-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--color-border);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.a11y-switch:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+html.reduce-motion .a11y-switch {
+  transition: none;
+}
+
+.a11y-switch.is-on {
+  background: var(--color-primary);
+}
+
+/* Switch thumb indicator */
+.a11y-switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+html.reduce-motion .a11y-switch-thumb {
+  transition: none;
+}
+
+.a11y-switch.is-on .a11y-switch-thumb {
+  transform: translateX(20px);
+}
+
+/* Reset button */
+#a11y-reset {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+#a11y-reset:hover {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+#a11y-reset:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+html.reduce-motion #a11y-reset {
+  transition: none;
+}
+
+/* Reading guide bar - visual guide for reading */
+#reading-guide-bar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 2.5em;
+  background: rgba(255, 255, 0, 0.12);
+  border-top: 2px solid rgba(200, 180, 0, 0.5);
+  border-bottom: 2px solid rgba(200, 180, 0, 0.5);
+  pointer-events: none;
+  z-index: 9980;
+}
+
+html.dark #reading-guide-bar {
+  background: rgba(100, 120, 255, 0.15);
+  border-top-color: rgba(120, 140, 255, 0.5);
+  border-bottom-color: rgba(120, 140, 255, 0.5);
+}
+
+html.high-contrast #reading-guide-bar {
+  background: transparent;
+  border-top-color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+/* Screen reader only utility class */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  #a11y-toolbar {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  #a11y-panel {
+    width: calc(100vw - 2rem);
+    max-width: 280px;
+  }
+}
+
+/* Dark mode adjustments */
+html.dark #a11y-toggle {
+  background: var(--color-primary);
+}
+
+html.dark #a11y-toggle:hover {
+  background: var(--color-primary-hover);
+}
+
+/* High contrast adjustments */
+html.high-contrast #a11y-toggle {
+  background: var(--color-primary);
+  border: 3px solid black;
+}
+
+html.high-contrast .a11y-switch {
+  background: white;
+  border: 2px solid black;
+}
+
+html.high-contrast .a11y-switch.is-on {
+  background: var(--color-primary);
+}
+
+html.high-contrast .a11y-switch-thumb {
+  background: black;
+}
+
+html.high-contrast #a11y-panel {
+  border: 2px solid black;
+  background: white;
+}
+
+html.high-contrast .a11y-panel-header {
+  background: white;
+  border-bottom: 2px solid black;
+  color: black;
+}
+
+html.high-contrast .a11y-label,
+html.high-contrast .a11y-icon {
+  color: black;
+}
+
+html.high-contrast .a11y-option:hover {
+  background: #f0f0f0;
+}
+
+/* Large font adjustments */
+html.large-font #a11y-toggle {
+  width: 56px;
+  height: 56px;
+  font-size: 1.6rem;
+}
+
+html.large-font .a11y-label {
+  font-size: 1rem;
+}
+
+html.large-font .a11y-switch {
+  width: 52px;
+  height: 28px;
+}
+
+html.large-font .a11y-switch-thumb {
+  width: 24px;
+  height: 24px;
+  top: 2px;
+  left: 2px;
+}
+
+html.large-font .a11y-switch.is-on .a11y-switch-thumb {
+  transform: translateX(24px);
+}
+
+/* Dyslexia font adjustments */
+html.dyslexia-font .a11y-label {
+  letter-spacing: 0.05em;
+  word-spacing: 0.15em;
+}
+
+/* Print styles - hide toolbar when printing */
+@media print {
+  #a11y-toolbar,
+  #reading-guide-bar {
+    display: none !important;
+  }
+}
