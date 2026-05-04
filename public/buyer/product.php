@@ -90,6 +90,7 @@ $csrf_token = generateCSRFToken();
                 </div>
                 <div class="flex items-center gap-4">
                     <a href="<?php echo BASE_URL; ?>/public/buyer/market.php" class="text-text hover:text-primary transition">← Back to Market</a>
+                    <a href="<?php echo BASE_URL; ?>/public/buyer/my-ratings.php" class="text-text hover:text-primary transition">⭐ My Ratings</a>
                     <a href="<?php echo BASE_URL; ?>/public/buyer/wishlist.php" class="text-text hover:text-primary transition">❤️ Wishlist</a>
                     <a href="<?php echo BASE_URL; ?>/public/logout.php" class="px-4 py-2 bg-error text-white rounded-lg hover:opacity-90 transition">Logout</a>
                 </div>
