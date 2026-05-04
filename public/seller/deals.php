@@ -74,6 +74,9 @@ $csrf_token = generateCSRFToken();
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 py-12">
+        <!-- CSRF Token (for AJAX requests) -->
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+        
         <!-- Breadcrumb -->
         <div class="mb-8">
             <a href="<?php echo BASE_URL; ?>/public/seller/dashboard.php" class="text-blue-600 hover:underline">Dashboard</a>
