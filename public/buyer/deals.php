@@ -1,7 +1,7 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/init.php';
 
-// Require buyer role
+// Require authentication and buyer role
 requireAuth(['buyer']);
 
 // Get buyer info
@@ -11,29 +11,29 @@ try {
     $stmt->execute([':user_id' => $_SESSION['user_id']]);
     $buyer_info = $stmt->fetch();
 } catch (Exception $e) {
-    setFlashMessage('Error loading buyer info.', 'error');
-    secureRedirect(BASE_URL . '/public/buyer/dashboard.php');
+    // Handle error
 }
 
-if (!$buyer_info) {
-    setFlashMessage('Buyer account not found.', 'error');
-    secureRedirect(BASE_URL . '/public/buyer/dashboard.php');
+// Get active deals count
+$active_deals_count = 0;
+if ($buyer_info) {
+    try {
+        $deal_obj = new Deal($pdo);
+        $active_deals = $deal_obj->getByBuyerID($buyer_info['buyer_id'], 'ongoing');
+        $active_deals_count = count($active_deals);
+    } catch (Exception $e) {
+        // Handle error
+    }
 }
-
-// Get all deals for this buyer
-$deal_obj = new Deal($pdo);
-$deals_ongoing = $deal_obj->getByBuyerID($buyer_info['buyer_id'], 'ongoing');
-$deals_completed = $deal_obj->getByBuyerID($buyer_info['buyer_id'], 'completed');
-$deals_cancelled = $deal_obj->getByBuyerID($buyer_info['buyer_id'], 'cancelled');
-
-$csrf_token = generateCSRFToken();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Deals - <?php echo APP_NAME; ?></title>
+    <meta name="description" content="Buyer Dashboard - <?php echo APP_NAME; ?>">
+    <meta name="theme-color" content="#0f766e">
+    <title>Buyer Dashboard - <?php echo APP_NAME; ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/tokens.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/main.css">
@@ -53,10 +53,8 @@ $csrf_token = generateCSRFToken();
     </script>
 </head>
 <body class="bg-gray-50">
-    <a href="#main-content" class="skip-link">Skip to main content</a>
-
     <!-- Navigation -->
-    <nav class="bg-surface shadow-md sticky top-0 z-50" role="navigation" aria-label="Main navigation">
+    <nav class="bg-surface shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center gap-8">
@@ -64,325 +62,165 @@ $csrf_token = generateCSRFToken();
                         <img src="<?php echo BASE_URL; ?>/assets/images/logo.png" alt="Partido Market Hub" class="h-8 w-auto rounded">
                         <span>Partido Online Hub</span>
                     </a>
+                    <span class="text-sm font-semibold bg-primary bg-opacity-20 text-primary px-3 py-1 rounded-full">Buyer Dashboard</span>
                 </div>
                 <div class="flex items-center gap-4">
                     <span class="text-text font-medium"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                    <a href="<?php echo BASE_URL; ?>/public/buyer/dashboard.php" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Dashboard</a>
+                    <a href="<?php echo BASE_URL; ?>/public/messenger/index.php" class="text-text font-medium hover:text-primary transition">💬 Messages</a>
                     <a href="<?php echo BASE_URL; ?>/public/buyer/my-ratings.php" class="text-text font-medium hover:text-primary transition">⭐ My Ratings</a>
+                    <a href="<?php echo BASE_URL; ?>/public/buyer/wishlist.php" class="text-text font-medium hover:text-primary transition">❤️ Wishlist</a>
                     <a href="<?php echo BASE_URL; ?>/public/logout.php" class="px-4 py-2 bg-error text-white rounded-lg hover:opacity-90 transition">Logout</a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 py-12">
-        <!-- CSRF Token (for AJAX requests) -->
-        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
-        
-        <!-- Breadcrumb -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Header -->
         <div class="mb-8">
-            <a href="<?php echo BASE_URL; ?>/public/buyer/dashboard.php" class="text-blue-600 hover:underline">Dashboard</a>
-            <span class="text-gray-500"> / </span>
-            <span class="text-gray-700">My Deals</span>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Buyer Dashboard</h1>
+            <p class="text-gray-600">Browse products and manage your purchases</p>
         </div>
 
-        <!-- Page Header -->
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">My Deals</h1>
-        <p class="text-gray-600 mb-8">Track all your deals with sellers</p>
-
-        <!-- Flash Messages -->
-        <?php if ($message = getFlashMessage()): ?>
-            <div class="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 text-green-700">
-                <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php endif; ?>
-
-        <!-- Stats -->
+        <!-- Stats Grid -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Active Deals -->
             <div class="bg-white rounded-lg shadow p-6">
-                <p class="text-gray-600 text-sm font-medium">Total Deals</p>
-                <p class="text-3xl font-bold text-gray-900 mt-2">
-                    <?php echo count($deals_ongoing) + count($deals_completed) + count($deals_cancelled); ?>
-                </p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Active Deals</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2"><?php echo $active_deals_count; ?></p>
+                    </div>
+                    <svg class="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                </div>
             </div>
 
+            <!-- Total Purchases -->
             <div class="bg-white rounded-lg shadow p-6">
-                <p class="text-gray-600 text-sm font-medium">Active</p>
-                <p class="text-3xl font-bold text-blue-600 mt-2"><?php echo count($deals_ongoing); ?></p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Total Purchases</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2"><?php echo $buyer_info['total_purchases'] ?? 0; ?></p>
+                    </div>
+                    <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10l8-4"></path>
+                    </svg>
+                </div>
             </div>
 
+            <!-- Total Spent -->
             <div class="bg-white rounded-lg shadow p-6">
-                <p class="text-gray-600 text-sm font-medium">Completed</p>
-                <p class="text-3xl font-bold text-green-600 mt-2"><?php echo count($deals_completed); ?></p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Total Spent</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2"><?php echo formatCurrency($buyer_info['total_spent'] ?? 0); ?></p>
+                    </div>
+                    <svg class="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
             </div>
 
+            <!-- Wishlisted -->
             <div class="bg-white rounded-lg shadow p-6">
-                <p class="text-gray-600 text-sm font-medium">Cancelled</p>
-                <p class="text-3xl font-bold text-red-600 mt-2"><?php echo count($deals_cancelled); ?></p>
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-600 text-sm font-medium">Wishlisted</p>
+                        <p class="text-3xl font-bold text-gray-900 mt-2">0</p>
+                    </div>
+                    <svg class="w-12 h-12 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </div>
             </div>
         </div>
 
-        <!-- Tabs Navigation -->
-        <div class="bg-white border-b border-gray-200 mb-8">
-            <div class="flex gap-0">
-                <button class="tab-btn active px-6 py-4 font-semibold border-b-2 border-blue-600 text-blue-600 transition" data-tab="ongoing">
-                    Active (<?php echo count($deals_ongoing); ?>)
-                </button>
-                <button class="tab-btn px-6 py-4 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-900 transition" data-tab="completed">
-                    Completed (<?php echo count($deals_completed); ?>)
-                </button>
-                <button class="tab-btn px-6 py-4 font-semibold border-b-2 border-transparent text-gray-600 hover:text-gray-900 transition" data-tab="cancelled">
-                    Cancelled (<?php echo count($deals_cancelled); ?>)
-                </button>
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Browse Market -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-bold mb-4">Browse Market</h3>
+                <div class="space-y-3">
+                    <a href="<?php echo BASE_URL; ?>/public/buyer/market.php" class="block px-4 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition font-medium">
+                        🛍️ View Marketplace
+                    </a>
+                    <a href="<?php echo BASE_URL; ?>/public/buyer/marketplace.php" class="block px-4 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition font-medium">
+                        🔍 Browse All Products
+                    </a>
+                </div>
+            </div>
+
+            <!-- My Deals -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <h3 class="text-lg font-bold mb-4">My Deals</h3>
+                <div class="space-y-3">
+                    <a href="<?php echo BASE_URL; ?>/public/buyer/deals.php" class="block px-4 py-2 bg-green-50 text-green-600 rounded hover:bg-green-100 transition font-medium">
+                        🤝 View My Deals
+                    </a>
+                    <div class="px-4 py-2 bg-green-50 text-green-600 rounded font-medium text-sm">
+                        <?php echo $active_deals_count; ?> active deals
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Active Deals Tab -->
-        <div id="ongoing-tab" class="tab-content">
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <?php if (empty($deals_ongoing)): ?>
-                    <div class="p-8 text-center">
-                        <p class="text-gray-600 mb-4">No active deals yet</p>
-                        <a href="<?php echo BASE_URL; ?>/public/buyer/market.php" class="text-blue-600 hover:underline">Browse the market →</a>
-                    </div>
-                <?php else: ?>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Seller</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Price</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Your Status</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Seller Status</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Initiated</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($deals_ongoing as $deal): ?>
-                                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                                                    <?php $img = getProductImageUrl($deal['image_path'] ?? ''); ?>
-                                                    <img src="<?php echo htmlspecialchars($img); ?>" alt="product" class="w-full h-full object-cover">
-                                                </div>
-                                                <p class="font-semibold text-gray-900"><?php echo htmlspecialchars($deal['product_name']); ?></p>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="text-gray-900"><?php echo htmlspecialchars($deal['seller_name'] ?? 'Unknown'); ?></p>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="font-semibold text-gray-900"><?php echo formatCurrency($deal['srp'] ?? 0); ?></p>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <?php if ($deal['confirmed_by_buyer']): ?>
-                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">✓ Confirmed</span>
-                                            <?php else: ?>
-                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">⏳ Pending</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <?php if ($deal['confirmed_by_seller']): ?>
-                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">✓ Confirmed</span>
-                                            <?php else: ?>
-                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">⏳ Pending</span>
-                                            <?php endif; ?>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">
-                                            <?php echo formatDate($deal['created_at'], 'M d, Y H:i'); ?>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex flex-col gap-2">
-                                                <?php if ($deal['confirmed_by_seller'] && !$deal['confirmed_by_buyer']): ?>
-                                                    <button type="button" class="px-3 py-1 text-sm rounded font-medium bg-green-600 text-white hover:bg-green-700 transition confirm-deal-btn" data-deal-id="<?php echo $deal['deal_id']; ?>">
-                                                        ✓ Confirm Deal
-                                                    </button>
-                                                <?php elseif (!$deal['confirmed_by_seller']): ?>
-                                                    <p class="text-xs text-gray-500">Waiting for seller...</p>
-                                                <?php endif; ?>
-                                                <a href="<?php echo BASE_URL; ?>/public/messenger/conversation.php?deal_id=<?php echo $deal['deal_id']; ?>" 
-                                                   class="px-3 py-1 text-sm rounded font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition text-center">
-                                                    💬 Message
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
+        <!-- Recent Orders -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-bold mb-4">Recent Orders</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="border-b border-gray-200">
+                        <tr>
+                            <th class="pb-3 font-semibold text-gray-700">Order ID</th>
+                            <th class="pb-3 font-semibold text-gray-700">Seller</th>
+                            <th class="pb-3 font-semibold text-gray-700">Product</th>
+                            <th class="pb-3 font-semibold text-gray-700">Amount</th>
+                            <th class="pb-3 font-semibold text-gray-700">Status</th>
+                            <th class="pb-3 font-semibold text-gray-700">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td colspan="6" class="py-8 text-center text-gray-500">No orders yet</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Completed Deals Tab -->
-        <div id="completed-tab" class="tab-content hidden">
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <?php if (empty($deals_completed)): ?>
-                    <div class="p-8 text-center">
-                        <p class="text-gray-600 mb-4">No completed deals yet</p>
-                    </div>
-                <?php else: ?>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Seller</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Price</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Completed</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($deals_completed as $deal): ?>
-                                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                                                    <?php $img = getProductImageUrl($deal['image_path'] ?? ''); ?>
-                                                    <img src="<?php echo htmlspecialchars($img); ?>" alt="product" class="w-full h-full object-cover">
-                                                </div>
-                                                <p class="font-semibold text-gray-900"><?php echo htmlspecialchars($deal['product_name']); ?></p>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="text-gray-900"><?php echo htmlspecialchars($deal['seller_name'] ?? 'Unknown'); ?></p>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="font-semibold text-gray-900"><?php echo formatCurrency($deal['srp'] ?? 0); ?></p>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">
-                                            <?php echo $deal['completed_at'] ? formatDate($deal['completed_at'], 'M d, Y H:i') : 'N/A'; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
+        <!-- Profile Info -->
+        <div class="bg-white rounded-lg shadow p-6 mt-8">
+            <h3 class="text-lg font-bold mb-4">Profile Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Full Name</p>
+                    <p class="mt-2 text-gray-900"><?php echo htmlspecialchars($_SESSION['full_name']); ?></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Email</p>
+                    <p class="mt-2 text-gray-900"><?php echo htmlspecialchars($_SESSION['email']); ?></p>
+                </div>
             </div>
-        </div>
-
-        <!-- Cancelled Deals Tab -->
-        <div id="cancelled-tab" class="tab-content hidden">
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <?php if (empty($deals_cancelled)): ?>
-                    <div class="p-8 text-center">
-                        <p class="text-gray-600 mb-4">No cancelled deals</p>
-                    </div>
-                <?php else: ?>
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Product</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Seller</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Price</th>
-                                    <th class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Cancelled</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($deals_cancelled as $deal): ?>
-                                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-12 h-12 bg-gray-200 rounded overflow-hidden flex-shrink-0">
-                                                    <?php $img = getProductImageUrl($deal['image_path'] ?? ''); ?>
-                                                    <img src="<?php echo htmlspecialchars($img); ?>" alt="product" class="w-full h-full object-cover">
-                                                </div>
-                                                <p class="font-semibold text-gray-900"><?php echo htmlspecialchars($deal['product_name']); ?></p>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="text-gray-900"><?php echo htmlspecialchars($deal['seller_name'] ?? 'Unknown'); ?></p>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="font-semibold text-gray-900"><?php echo formatCurrency($deal['srp'] ?? 0); ?></p>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-600">
-                                            <?php echo formatDate($deal['created_at'], 'M d, Y H:i'); ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                <?php endif; ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Delivery Address</p>
+                    <p class="mt-2 text-gray-900"><?php echo htmlspecialchars($buyer_info['full_address'] ?? 'No address set'); ?></p>
+                </div>
+                <div>
+                    <p class="text-gray-600 text-sm font-medium">Location</p>
+                    <p class="mt-2 text-gray-900">
+                        <?php echo htmlspecialchars(($buyer_info['barangay'] ?? '') . ', ' . ($buyer_info['municipality'] ?? '') . ', ' . ($buyer_info['province'] ?? '')); ?>
+                    </p>
+                </div>
             </div>
-        </div>
-
-        <!-- Info Box -->
-        <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p class="text-sm text-blue-700">
-                <strong>📌 How it works:</strong> After confirming a deal, you can rate the seller. Both parties must confirm for the deal to be marked complete.
-            </p>
+            <a href="<?php echo BASE_URL; ?>/public/buyer/account_settings.php" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                Edit Profile
+            </a>
         </div>
     </div>
-
-    <script>
-        // Tab switching
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.tab-btn').forEach(b => {
-                    b.classList.remove('border-blue-600', 'text-blue-600', 'active');
-                    b.classList.add('border-transparent', 'text-gray-600');
-                });
-                
-                this.classList.add('border-blue-600', 'text-blue-600', 'active');
-                
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.add('hidden');
-                });
-                
-                const tab = this.dataset.tab;
-                document.getElementById(tab + '-tab').classList.remove('hidden');
-            });
-        });
-
-        // Deal confirmation
-        document.querySelectorAll('.confirm-deal-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
-                const dealId = this.dataset.dealId;
-                const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-
-                if (!confirm('Confirm this deal is complete?')) {
-                    return;
-                }
-
-                try {
-                    const response = await fetch('<?php echo BASE_URL; ?>/public/buyer/confirm_deal.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `deal_id=${dealId}&csrf_token=${csrfToken}`
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        alert(data.message);
-                        if (data.redirect) {
-                            window.location.href = data.redirect;
-                        }
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                } catch (error) {
-                    alert('Error confirming deal: ' + error.message);
-                }
-            });
-        });
-
-        function cancelDeal(dealId) {
-            if (confirm('Are you sure you want to cancel this deal?')) {
-                alert('Deal cancellation coming in Stage 4!');
-            }
-        }
-    </script>
     <?php include $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php'; ?>
 </body>
 </html>
+
