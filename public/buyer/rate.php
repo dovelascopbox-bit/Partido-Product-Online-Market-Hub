@@ -7,7 +7,7 @@
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/init.php';
 
 // Check authentication
-if (!Auth::isAuthenticated() || $_SESSION['user_role'] !== 'buyer') {
+if (!Auth::isAuthenticated() || $_SESSION['role'] !== 'buyer') {
     header('Location: ' . BASE_URL . '/public/login.php');
     exit;
 }
@@ -43,8 +43,17 @@ if (!$deal) {
     exit;
 }
 
+// Debug logging
+error_log("=== RATE.PHP DEBUG ===");
+error_log("Session user_id: " . $_SESSION['user_id']);
+error_log("Buyer ID: " . $buyer_id);
+error_log("Deal buyer_id: " . $deal['buyer_id']);
+error_log("Deal seller_id: " . $deal['seller_id']);
+error_log("Deal status: " . $deal['status']);
+
 // Verify buyer is part of this deal
 if ($deal['buyer_id'] != $buyer_id) {
+    error_log("ERROR: Buyer mismatch. Expected " . $buyer_id . " but got " . $deal['buyer_id']);
     header('Location: ' . BASE_URL . '/public/buyer/deals.php');
     exit;
 }
@@ -146,6 +155,11 @@ if (!isset($_SESSION['csrf_token'])) {
             <?php if ($error_message): ?>
                 <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                     <p class="text-red-700"><?php echo htmlspecialchars($error_message); ?></p>
+                    <?php if ($error_message === 'Cannot rate yourself.' || strpos($error_message, 'Unauthorized') !== false): ?>
+                        <p class="text-red-600 text-sm mt-2">
+                            <strong>Debug Info:</strong> Buyer ID: <?php echo $buyer_id; ?> | Seller ID: <?php echo $deal['seller_id'] ?? 'N/A'; ?>
+                        </p>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
 
