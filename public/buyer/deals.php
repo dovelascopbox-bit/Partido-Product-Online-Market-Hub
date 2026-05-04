@@ -68,6 +68,7 @@ $csrf_token = generateCSRFToken();
                 <div class="flex items-center gap-4">
                     <span class="text-text font-medium"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
                     <a href="<?php echo BASE_URL; ?>/public/buyer/dashboard.php" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">Dashboard</a>
+                    <a href="<?php echo BASE_URL; ?>/public/buyer/my-ratings.php" class="text-text font-medium hover:text-primary transition">⭐ My Ratings</a>
                     <a href="<?php echo BASE_URL; ?>/public/logout.php" class="px-4 py-2 bg-error text-white rounded-lg hover:opacity-90 transition">Logout</a>
                 </div>
             </div>
@@ -75,6 +76,9 @@ $csrf_token = generateCSRFToken();
     </nav>
 
     <div class="max-w-7xl mx-auto px-4 py-12">
+        <!-- CSRF Token (for AJAX requests) -->
+        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($csrf_token); ?>">
+        
         <!-- Breadcrumb -->
         <div class="mb-8">
             <a href="<?php echo BASE_URL; ?>/public/buyer/dashboard.php" class="text-blue-600 hover:underline">Dashboard</a>
