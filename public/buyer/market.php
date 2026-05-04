@@ -149,6 +149,9 @@ if (isset($_SESSION["wishlist"]) && is_array($_SESSION["wishlist"])) {
             <a href="<?php echo BASE_URL; ?>/public/buyer/deals.php" style="color: #374151; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.2s; text-decoration: none; font-size: 0.95rem;">
                 Deals
             </a>
+            <a href="<?php echo BASE_URL; ?>/public/buyer/my-ratings.php" style="color: #374151; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.2s; text-decoration: none; font-size: 0.95rem;">
+                ⭐ My Ratings
+            </a>
             <a href="<?php echo BASE_URL; ?>/public/buyer/wishlist.php" style="position: relative; color: #374151; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.5rem; transition: all 0.2s; text-decoration: none; font-size: 0.95rem;">
                 Wishlist
                 <?php if ($wishlist_count > 0): ?>
