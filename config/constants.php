@@ -41,7 +41,7 @@ define('MSG_VERIFICATION_SENT', 'Verification email sent! Check your inbox.');
 
 // Email Verification Settings
 // Set to FALSE for production - email verification required
-define('SKIP_EMAIL_VERIFICATION', false);
+define('SKIP_EMAIL_VERIFICATION', true);
 
 // Environment
 define('ENVIRONMENT', 'production');
