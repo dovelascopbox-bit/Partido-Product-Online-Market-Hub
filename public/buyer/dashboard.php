@@ -67,6 +67,7 @@ if ($buyer_info) {
                 <div class="flex items-center gap-4">
                     <span class="text-text font-medium"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
                     <a href="<?php echo BASE_URL; ?>/public/messenger/index.php" class="text-text font-medium hover:text-primary transition">💬 Messages</a>
+                    <a href="<?php echo BASE_URL; ?>/public/buyer/my-ratings.php" class="text-text font-medium hover:text-primary transition">⭐ My Ratings</a>
                     <a href="<?php echo BASE_URL; ?>/public/buyer/wishlist.php" class="text-text font-medium hover:text-primary transition">❤️ Wishlist</a>
                     <a href="<?php echo BASE_URL; ?>/public/logout.php" class="px-4 py-2 bg-error text-white rounded-lg hover:opacity-90 transition">Logout</a>
                 </div>
